@@ -74,7 +74,7 @@ The app includes a dedicated utility to verify webhook signatures (`X-Signature`
 
 ## 🤝 Support
 
-For more details on the API, visit the [Official Pixelz Automation API Documentation](https://docs.pixelz.com/automationapi/index.html). If you encounter issues or have questions, please reach out to our support team at [cs@pixelz.com](mailto:cs@pixelz.com).
+For more details on the API, visit the [Official Pixelz Automation API Documentation](https://docs.pixelz.com/automationapi/index.html). We do not offer support for this demo application.
 
 ## 📄 License
 
