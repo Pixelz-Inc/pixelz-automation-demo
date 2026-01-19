@@ -2,7 +2,7 @@
 
 This application is a cross-platform (Windows & macOS) desktop tool designed to demonstrate the capabilities of the [Pixelz Automation API](https://docs.pixelz.com/automationapi/index.html). It serves as "Living Documentation," allowing developers to experiment with image processing methods, view real-time API communication, and understand common integration patterns.
 
-![Pixelz Automation Demo App](icon.png)
+![Pixelz Automation Demo App](app-screenshot.png)
 
 ## 🚀 Key Features
 
