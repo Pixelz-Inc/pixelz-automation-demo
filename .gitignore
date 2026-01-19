@@ -1,0 +1,24 @@
+# Dependency directories
+node_modules/
+dist/
+out/
+build/
+
+# IDE files
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+
+# Local configuration/secrets
+*.enc
+*.log
+
+# Environment variables
+.env
+.env.*
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
