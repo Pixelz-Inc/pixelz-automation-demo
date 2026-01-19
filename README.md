@@ -4,6 +4,8 @@ This application is a cross-platform (Windows & macOS) desktop tool designed to 
 
 ![Pixelz Automation Demo App](app-screenshot.png)
 
+The app is coded using AI coding tools, and the [requirements.md](requirements.md) file contains the requirements for the app.
+
 ## 🚀 Key Features
 
 -   **Interactive API Exploration**: Test methods like Remove Background, Color Matching, Model Crop, and more.
