@@ -829,7 +829,7 @@ paths:
                   softer edges.
                 value:
                   image_url: https://example.com/product-image.jpg
-                  feather_width: 2
+                  feather_width: 3
               WithCustomTrimap:
                 summary: Mask with custom trimap
                 description: Use this example when you have a custom trimap to control which
@@ -837,7 +837,7 @@ paths:
                 value:
                   image_url: https://example.com/product-image.jpg
                   trimap_url: https://example.com/custom-trimap.png
-                  feather_width: 1.5
+                  feather_width: 3
               WithAsyncCallback:
                 summary: Asynchronous processing with webhook callback
                 description: Use this example to process the image asynchronously. Set the
@@ -848,7 +848,7 @@ paths:
                   (HTTP 201).
                 value:
                   image_url: https://example.com/product-image.jpg
-                  feather_width: 1.5
+                  feather_width: 3
                   callback_url: https://your-domain.com/webhook/create-mask
       responses:
         "200":
@@ -1582,7 +1582,7 @@ paths:
                   image_url: https://example.com/product-image.jpg
                   transparent_background: true
                   background_color: null
-                  feather_width: 1.5
+                  feather_width: 3
               WithBackgroundColor:
                 summary: Remove background with solid color
                 description: Use this example to remove the background and replace it with a
@@ -1592,7 +1592,7 @@ paths:
                   image_url: https://example.com/product-image.jpg
                   background_color: "#FFFFFF"
                   transparent_background: false
-                  feather_width: 2
+                  feather_width: 5
               WithCustomTrimap:
                 summary: Remove background with custom trimap
                 description: Use this example when you have a custom trimap image to control
@@ -1603,7 +1603,7 @@ paths:
                   trimap_url: https://example.com/custom-trimap.png
                   transparent_background: true
                   background_color: null
-                  feather_width: 1.5
+                  feather_width: 3
               WithAsyncCallback:
                 summary: Asynchronous processing with webhook callback
                 description: Use this example to process the image asynchronously. Set the
@@ -1616,7 +1616,7 @@ paths:
                   image_url: https://example.com/product-image.jpg
                   transparent_background: true
                   background_color: null
-                  feather_width: 1.5
+                  feather_width: 3
                   callback_url: https://your-domain.com/webhook/remove-background
       responses:
         "200":
@@ -1894,14 +1894,12 @@ components:
       properties:
         feather_width:
           type: number
-          description: This is an optional setting which you should only use if the
-            default feather width, determined by the AI, does not suit your
-            needs. This value is the number of pixels that the mask will take to
-            transition from fully opaque (255, white) to fully transparent (0,
-            black). A value of 0 or 1 will give you very sharp edges while
-            larger values will provide softer edges. It is recommended to use
-            this only in cases where the focus is uniform on the object. Avoid
-            using this in cases like depth of field effects.
+          description: "This is an optional setting. If omitted, the feather width 
+            will be automatically determined by the AI. If set to 0, no feathering 
+            will be applied, resulting in very sharp edges. Other values specify 
+            the number of pixels that the mask will take to transition from fully 
+            opaque (255, white) to fully transparent (0, black). Higher values 
+            provide softer edges."
           format: double
           nullable: true
           example: 1.5
@@ -2145,14 +2143,12 @@ components:
           example: https://example.com/image.jpg
         feather_width:
           type: number
-          description: This is an optional setting which you should only use if the
-            default feather width, determined by the AI, does not suit your
-            needs. This value is the number of pixels that the mask will take to
-            transition from fully opaque (255, white) to fully transparent (0,
-            black). A value of 0 or 1 will give you very sharp edges while
-            larger values will provide softer edges. It is recommended to use
-            this only in cases where the focus is uniform on the object. Avoid
-            using this in cases like depth of field effects.
+          description: "This is an optional setting. If omitted, the feather width 
+            will be automatically determined by the AI. If set to 0, no feathering 
+            will be applied, resulting in very sharp edges. Other values specify 
+            the number of pixels that the mask will take to transition from fully 
+            opaque (255, white) to fully transparent (0, black). Higher values 
+            provide softer edges."
           format: double
           nullable: true
           example: 1.5

@@ -25,7 +25,8 @@ import { useImageStore } from '../../store/imageStore'
 
 export default function RemoveBackground() {
     const { imageUrl: sharedImageUrl, setImageUrl: setSharedImageUrl } = useImageStore()
-    const [featherWidth, setFeatherWidth] = useState(10) // Default to 10
+    const [featherWidth, setFeatherWidth] = useState(3) // Default to 3
+    const [autoFeather, setAutoFeather] = useState(true) // AI determined by default
     const [transparentBackground, setTransparentBackground] = useState(true)
     const [backgroundColor, setBackgroundColor] = useState('#FFFFFF')
     const [trimapUrl, setTrimapUrl] = useState('')
@@ -61,7 +62,7 @@ export default function RemoveBackground() {
             pollInterval: INITIAL_POLL_INTERVAL,
             inputs: {
                 image_url: sharedImageUrl,
-                feather_width: featherWidth,
+                feather_width: autoFeather ? undefined : featherWidth,
                 transparent_background: transparentBackground,
                 background_color: transparentBackground ? null : backgroundColor,
                 trimap_url: trimapUrl || undefined,
@@ -78,7 +79,7 @@ export default function RemoveBackground() {
         try {
             const params = {
                 image_url: sharedImageUrl,
-                feather_width: featherWidth,
+                feather_width: autoFeather ? undefined : featherWidth,
                 transparent_background: transparentBackground,
                 background_color: transparentBackground ? null : backgroundColor,
                 trimap_url: trimapUrl || undefined,
@@ -157,15 +158,27 @@ export default function RemoveBackground() {
                 {/* Feather Width */}
                 <FormControl>
                     <HStack justify="space-between" mb={2}>
-                        <FormLabel fontSize="sm" mb={0}>Feather Width</FormLabel>
-                        <Badge colorScheme="brand">{featherWidth}</Badge>
+                        <HStack spacing={4}>
+                            <FormLabel fontSize="sm" mb={0}>Feather Width</FormLabel>
+                            <Checkbox
+                                isChecked={autoFeather}
+                                onChange={(e) => setAutoFeather(e.target.checked)}
+                                size="sm"
+                                colorScheme="brand"
+                            >
+                                <Text fontSize="xs">AI Determined</Text>
+                            </Checkbox>
+                        </HStack>
+                        {!autoFeather && <Badge colorScheme="brand">{featherWidth}</Badge>}
                     </HStack>
                     <Slider
                         value={featherWidth}
                         onChange={setFeatherWidth}
                         min={0}
-                        max={50}
+                        max={20}
                         step={1}
+                        isDisabled={autoFeather}
+                        opacity={autoFeather ? 0.4 : 1}
                     >
                         <SliderTrack>
                             <SliderFilledTrack />
@@ -173,7 +186,9 @@ export default function RemoveBackground() {
                         <SliderThumb />
                     </Slider>
                     <Text fontSize="xs" color="gray.500" mt={1}>
-                        0 = AI determined, higher values = softer edges
+                        {autoFeather
+                            ? "AI will determine the best feather width"
+                            : "0 = sharp edges, higher values = softer edges"}
                     </Text>
                 </FormControl>
 
