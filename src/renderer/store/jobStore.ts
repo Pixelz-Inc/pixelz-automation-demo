@@ -13,6 +13,7 @@ export interface Job {
     lastCheckedAt?: number
     nextCheckAt?: number
     pollInterval?: number // Current poll interval in ms (for exponential backoff)
+    retryAfter?: number // Initial delay in seconds from API
     inputs: Record<string, unknown>
     result?: {
         result_image_url?: string

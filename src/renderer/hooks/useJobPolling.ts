@@ -89,8 +89,13 @@ export function useJobPolling() {
                 !pollTimeoutsRef.current.has(job.id)
             ) {
                 // Start polling for this job
-                const interval = job.pollInterval || INITIAL_POLL_INTERVAL
-                const delay = job.nextCheckAt ? Math.max(0, job.nextCheckAt - Date.now()) : 0
+                const retryAfterMs = (job.retryAfter || 0) * 1000
+                const interval = job.pollInterval || retryAfterMs || INITIAL_POLL_INTERVAL
+
+                // If it's the first check, use the retryAfter delay if present
+                const delay = job.nextCheckAt
+                    ? Math.max(0, job.nextCheckAt - Date.now())
+                    : (job.retryAfter ? retryAfterMs : 0)
 
                 const timeout = setTimeout(() => {
                     checkJobStatus(job.id, job.jobId!, interval)

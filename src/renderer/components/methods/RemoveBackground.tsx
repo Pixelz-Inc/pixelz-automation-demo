@@ -103,13 +103,14 @@ export default function RemoveBackground() {
                         duration: 3000,
                     })
                 } else {
-                    // Async response contains job_id
-                    const data = result.data as { job_id: string }
+                    // Async response contains job_id and optional retryAfter
+                    const data = result.data as { job_id: string; retryAfter?: number }
                     updateJob(jobId, {
                         jobId: data.job_id,
                         status: 'processing',
+                        retryAfter: data.retryAfter,
                         lastCheckedAt: Date.now(),
-                        nextCheckAt: Date.now() + INITIAL_POLL_INTERVAL,
+                        nextCheckAt: Date.now() + (data.retryAfter ? data.retryAfter * 1000 : INITIAL_POLL_INTERVAL),
                     })
                     toast({
                         title: 'Job submitted',

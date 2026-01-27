@@ -209,12 +209,13 @@ export default function ColorMatching() {
                         duration: 3000,
                     })
                 } else {
-                    const data = result.data as { job_id: string }
+                    const data = result.data as { job_id: string; retryAfter?: number }
                     updateJob(jobId, {
                         jobId: data.job_id,
                         status: 'processing',
+                        retryAfter: data.retryAfter,
                         lastCheckedAt: Date.now(),
-                        nextCheckAt: Date.now() + INITIAL_POLL_INTERVAL,
+                        nextCheckAt: Date.now() + (data.retryAfter ? data.retryAfter * 1000 : INITIAL_POLL_INTERVAL),
                     })
                     toast({
                         title: 'Job submitted',

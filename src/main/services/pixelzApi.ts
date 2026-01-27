@@ -12,6 +12,7 @@ export interface TokenResponse {
 
 export interface JobCreationResponse {
     job_id: string
+    retryAfter?: number // Recommended delay in seconds
 }
 
 export interface JobStatusResponse {
@@ -61,13 +62,24 @@ class PixelzApiService {
             }
         )
 
-        // Response interceptor for logging
+        // Response interceptor for logging and header extraction
         this.axiosInstance.interceptors.response.use(
             (response) => {
                 logger.info(`API Response: ${response.status} ${response.config.url}`, {
                     responseHeaders: response.headers,
                     responseBody: response.data
                 })
+
+                // Extract Retry-After if present (mostly for 201 Created)
+                if (response.status === 201 && response.headers['retry-after']) {
+                    const retryAfter = parseInt(response.headers['retry-after'], 10)
+                    if (!isNaN(retryAfter)) {
+                        if (typeof response.data === 'object' && response.data !== null) {
+                            (response.data as any).retryAfter = retryAfter
+                        }
+                    }
+                }
+
                 return response
             },
             (error) => {

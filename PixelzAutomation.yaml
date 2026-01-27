@@ -1,11 +1,11 @@
 openapi: 3.0.1
 info:
   title: Pixelz Automation API
-  description: "\r
+  description: "
 
-    # Pixelz Automation API\r
+    # Pixelz Automation API
 
-    # Introduction\r
+    # Introduction
 
     The Pixelz Automation API gives you direct access to our in-house AI models
     for image retouching. By calling the API, you can use the same proprietary
@@ -15,66 +15,61 @@ info:
     you can automate tasks such as Remove Background, Create Mask, Create
     Trimap, Model Crop, or Color Matching. Edited images can be returned in
     seconds for quick jobs, or processed in large batches of thousands when
-    scale is needed.\r
+    scale is needed.
 
-    \r
 
-    # How It Works\r
+    # How It Works
 
-    \r
 
     The Automation API is built with a focus on security, reliability, and
     flexibility. Every request, every image, and every result is handled with
-    the same standards we apply in our own production systems.\r
+    the same standards we apply in our own production systems.
 
-    \r
 
-    ### Authentication and Security\r
+    ### Authentication and Security
 
     - Access is secured with OAuth 2.0 (Client Credentials flow) using JSON Web
     Tokens. This ensures that only authorized systems can interact with the API,
     with credentials exchanged and validated through an industry-standard
-    protocol.\r
+    protocol.
+
+    - The identity server is powered by **Keycloak**, an open-source identity
+    and access management solution that handles authentication, token issuance,
+    and client credential verification.
 
     - For additional protection, uploads are handled via presigned URLs with
-    strict time limits and automatic file deletion after processing.\r
+    strict time limits and automatic file deletion after processing.
 
-    \r
 
     **Request an Access Token:** Exchange your credentials for an access token
-    by making a POST request to the token endpoint:\r
+    by making a POST request to the token endpoint:
 
-    \r
 
-    ```bash\r
+    ```bash
 
     POST
-    https://id.pixelz.com/realms/pixelz-automations/protocol/openid-connect/\r
+    https://id.pixelz.com/realms/pixelz-automations/protocol/openid-connect/tok\
+    en
 
-    Content-Type: application/x-www-form-urlencoded\r
+    Content-Type: application/x-www-form-urlencoded
 
-    \r
 
-    grant_type=client_credentials\r
+    grant_type=client_credentials
 
-    &client_id=YOUR_CLIENT_ID\r
+    &client_id=YOUR_CLIENT_ID
 
-    &client_secret=YOUR_CLIENT_SECRET\r
+    &client_secret=YOUR_CLIENT_SECRET
 
-    &audience=automation.api\r
+    ```
 
-    ```\r
-
-    \r
 
     **Receive Token Response:** The token endpoint will return a JSON response
-    containing your access token:\r
+    containing your access token:
 
-    \r
 
-    ```json\r
+    ```json
 
-    {\r
+    {
 
     \    \"access_token\":
     \"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJMY3pMeVVPSFIzN3ZkWVM5N\
@@ -94,497 +89,501 @@ info:
     5JQ_T2znPqEM3Y-201gBC6enDamcvzF2__Kt31b1DltnDPhzMuw3ZkrMtmjj_FgQz4-NnTlNouI\
     -x54G6wZv3_WBVz5oXVFfxDHIt3KEeLETj47vnqMA4cMtc_8jAXwdK-ZvOYzCDMzcAaTM8N-mCX\
     ZFgOS7w3UZNXqD84dEN1LwTAxh8LbX8_6eIGiHfs_yHneSXxEtWVA1LB84u34iAARXbxlRCBG3y\
-    Nj1yi_lyRXz_h9tQmfJ1KJF3N9_CA\",\r
+    Nj1yi_lyRXz_h9tQmfJ1KJF3N9_CA\",
 
-    \    \"expires_in\": 3600,\r
+    \    \"expires_in\": 3600,
 
-    \    \"refresh_expires_in\": 0,\r
+    \    \"refresh_expires_in\": 0,
 
-    \    \"token_type\": \"Bearer\",\r
+    \    \"token_type\": \"Bearer\",
 
-    \    \"not-before-policy\": 0,\r
+    \    \"not-before-policy\": 0,
 
-    \    \"scope\": \"automation-api.all automation-api.files.upload\"\r
+    \    \"scope\": \"automation-api.images.all automation-api.files.upload\"
 
-    }\r
+    }
 
-    ```\r
+    ```
 
-    \r
 
     **Use the Token:** Include the access token in the `Authorization` header of
-    all API requests:\r
+    all API requests:
 
-    \r
 
-    ```bash\r
+    ```bash
 
     Authorization: Bearer
-    eyJhbGciOiJSUzI1NiIsImtpZCI6IjEyMyIsInR5cCI6IkpXVCJ9...\r
+    eyJhbGciOiJSUzI1NiIsImtpZCI6IjEyMyIsInR5cCI6IkpXVCJ9...
 
-    ```\r
+    ```
 
-    \r
 
-    **Token Lifetime**\r
+    **Token Lifetime**
 
-    \r
 
     - Access tokens are valid for **1 hour (3600 seconds)** from the time of
-    issuance.\r
+    issuance.
 
-    - When a token expires, request a new one using the same client
-    credentials.\r
+    - When a token expires, request a new one using the same client credentials.
 
     - There is no refresh token in the Client Credentials flow - simply request
-    a new access token when needed.\r
+    a new access token when needed.
 
-    \r
 
-    **Scopes**\r
+    **Scopes**
 
-    \r
 
-    The API uses scopes to control access to different features:\r
+    The API uses scopes to control access to different features:
 
-    - `automation.api` - Access to image processing endpoints (Model Crop, Mask,
-    Trimap, Color Matching, Remove Background)\r
+    - `automation-api.images.all` - Access to image processing endpoints (Model
+    Crop, Mask, Trimap, Color Matching, Remove Background)
 
-    - `file.api` - Access to file upload functionality (must be explicitly
-    enabled for your account)\r
+    - `automation-api.files.upload` - Access to file upload functionality (must
+    be explicitly enabled for your account)
 
-    Request only the scopes you need for your application.\r
+    Request only the scopes you need for your application.
 
-    \r
 
-    ## Documentation\r
+    ## Documentation
 
     The API is fully described with the OpenAPI specification and delivered
     through Scalar UI. Endpoints, parameters, and response structures are
-    defined so you can integrate them into any technical environment.\r
+    defined so you can integrate them into any technical environment.
 
-    \r
 
-    ## File input\r
+    ## File input
 
-    - Images can be provided in two ways:\r
+    - Images can be provided in two ways:
 
-    \    * As a public URL (if already hosted online).\r
+    \    * As a public URL (if already hosted online).
 
-    \    * As a secure direct upload via presigned URLs.\r
+    \    * As a secure direct upload via presigned URLs.
 
     - Supported formats include JPG, PNG, and WEBP, with automatic cleanup of
-    uploaded files to protect data privacy.\r
+    uploaded files to protect data privacy.
 
-    \r
 
-    ## File Storage Policy\r
+    ## Output File Naming
 
-    \r
+
+    The API automatically renames result files to help you identify the
+    processing operation that was applied. Each output file uses the original
+    filename with a descriptive suffix appended:
+
+
+    **Naming Pattern:** `{original_filename}_{operation_suffix}.{extension}`
+
+
+    **Operation Suffixes:**
+
+    - **Model Crop:** `cropped` (e.g., `product.jpg` → `product_cropped.jpg`)
+
+    - **Color Matching:** `color_matched` (e.g., `product.jpg` →
+    `product_color_matched.jpg`)
+
+    - **Remove Background:** `bg_removed` (e.g., `product.jpg` →
+    `product_bg_removed.png`)
+
+    - **Create Mask:** `masked` (e.g., `product.jpg` → `product_masked.png`)
+
+    - **Create Trimap:** `trimaprgb` for the image, `trimap.json` for the vector
+    data (e.g., `product.jpg` → `product_trimaprgb.png` and
+    `product_trimap.json`)
+
+
+    The file extension is determined by the output format of the processing
+    operation (typically PNG for operations involving transparency).
+
+
+    ## File Storage Policy
+
 
     Understanding how long files are stored helps you plan your workflow and
-    download timing:\r
+    download timing:
 
-    \r
 
-    **Uploaded Files (Source Images):**\r
+    **Uploaded Files (Source Images):**
 
-    - Files uploaded via presigned URLs are stored temporarily for **24
-    hours**\r
+    - Files uploaded via presigned URLs are stored temporarily for **24 hours**
 
-    - Automatic deletion after processing ensures data privacy and security\r
+    - Automatic deletion after processing ensures data privacy and security
 
-    - No manual cleanup required on your part\r
+    - No manual cleanup required on your part
 
-    \r
 
-    **Result Files (Processed Images):**\r
+    **Result Files (Processed Images):**
 
-    - Result URLs remain valid for **7 days** from job completion\r
+    - Result URLs remain valid for **7 days** from job completion
 
-    - This applies to both synchronous and asynchronous processing modes\r
+    - This applies to both synchronous and asynchronous processing modes
 
-    - Download your results within this timeframe to ensure access\r
+    - Download your results within this timeframe to ensure access
 
-    - After expiration, files are automatically deleted and URLs become
-    invalid\r
+    - After expiration, files are automatically deleted and URLs become invalid
 
-    \r
 
-    **Presigned Upload URLs:**\r
+    **Presigned Upload URLs:**
 
-    - Upload URLs expire after **24 hours** from generation\r
+    - Upload URLs expire after **24 hours** from generation
 
-    - Complete your file upload within this timeframe\r
+    - Complete your file upload within this timeframe
 
-    - Request a new URL if the original expires before upload\r
+    - Request a new URL if the original expires before upload
 
-    \r
 
-    **Best Practices:**\r
+    **Best Practices:**
 
-    - Download and store result files in your own storage system promptly\r
+    - Download and store result files in your own storage system promptly
 
-    - Don't rely on Pixelz URLs as permanent storage\r
+    - Don't rely on Pixelz URLs as permanent storage
 
-    - Implement automatic download workflows for asynchronous jobs\r
+    - Implement automatic download workflows for asynchronous jobs
 
-    \r
 
-    ## Processing Modes\r
+    ## Processing Modes
 
-    \r
 
     The API supports both synchronous and asynchronous processing modes to
-    accommodate different use cases and workloads:\r
+    accommodate different use cases and workloads:
 
-    \r
 
-    ### Synchronous Mode\r
+    ### Synchronous Mode
 
-    - Results are returned immediately in the same HTTP response\r
+    - Results are returned immediately in the same HTTP response
 
-    - Best for lightweight operations or when you need instant results\r
+    - Best for lightweight operations or when you need instant results
 
-    - Returns HTTP 200 status with the processed result\r
+    - Returns HTTP 200 status with the processed result
 
-    - No webhook or job tracking required\r
+    - No webhook or job tracking required
 
-    \r
 
-    ### Asynchronous Mode\r
+    ### Asynchronous Mode
 
-    - For larger image or when you prefer non-blocking operations\r
+    - For larger image or when you prefer non-blocking operations
 
-    - Returns HTTP 201 status with a `job_id` for tracking\r
+    - Returns HTTP 201 status with a `job_id` for tracking
 
-    - Results can be retrieved via the `/images/jobs/{jobId}/status` endpoint\r
+    - Results can be retrieved via the `/images/jobs/{jobId}/status` endpoint
 
     - Optionally, results can be delivered via webhook callback if you provide a
-    `callback_url`\r
+    `callback_url`
 
     - Webhooks are cryptographically signed using ECDSA with SHA256 to guarantee
-    authenticity\r
+    authenticity
 
-    \r
 
-    **How to Use Asynchronous Mode:**\r
+    **How to Use Asynchronous Mode:**
 
-    1. Add the header `Respond-Mode: async` to your API request\r
+    1. Add the header `Respond-Mode: async` to your API request
 
     2. Optionally include a `callback_url` parameter if you want webhook
-    notifications\r
+    notifications
 
-    3. Receive a `job_id` in the immediate response (HTTP 201)\r
+    3. Receive a `job_id` in the immediate response (HTTP 201)
 
-    4. Poll the `/images/jobs/{jobId}/status` endpoint to check job progress and
-    retrieve results\r
+    4. Check the `Retry-After` header in the response, which indicates the
+    recommended delay (in seconds) before checking job status
 
-    5. If you provided a `callback_url`, your callback endpoint will receive a
-    POST request with the results when processing completes\r
+    5. Poll the `/images/jobs/{jobId}/status` endpoint to check job progress and
+    retrieve results
 
-    6. Verify the webhook signature using the public key from the `/public-keys`
-    endpoint\r
+    6. If you provided a `callback_url`, your callback endpoint will receive a
+    POST request with the results when processing completes
 
-    \r
+    7. Verify the webhook signature using the public key from the `/public-keys`
+    endpoint
 
-    **Webhook Payload Structure:**\r
 
-    \r
+    **Retry-After Header:**
+
+    - When you submit a job in asynchronous mode, the API returns a
+    `Retry-After` header with a value in seconds (default: 30)
+
+    - This header indicates the recommended minimum delay before your first
+    status check
+
+    - Respecting this header helps optimize server load and prevents unnecessary
+    polling
+
+    - Example: `Retry-After: 30` means you should wait at least 30 seconds
+    before checking the job status
+
+
+    **Webhook Payload Structure:**
+
 
     When your job completes, a POST request will be sent to your `callback_url`
-    with the following JSON payload:\r
+    with the following JSON payload:
 
-    \r
 
-    ```json\r
+    ```json
 
-    {\r
+    {
 
-    \  \"JobId\": \"12345678-1234-1234-1234-123456789012\",\r
+    \  \"JobId\": \"12345678-1234-1234-1234-123456789012\",
 
-    \  \"Status\": \"completed\",\r
+    \  \"Status\": \"completed\",
 
-    \  \"EventType\": \"job.completed\",\r
+    \  \"EventType\": \"job.completed\",
 
-    \  \"Timestamp\": \"2025-01-31T12:00:00.0000000Z\",\r
+    \  \"Timestamp\": \"2025-01-31T12:00:00.0000000Z\",
 
-    \  \"WebhookVersion\": \"1.0\",\r
+    \  \"WebhookVersion\": \"1.0\",
 
-    \  \"ResultData\": {\r
+    \  \"ResultData\": {
 
-    \    \"ResultImageUrl\": \"https://example.com/result-image.png\",\r
+    \    \"ResultImageUrl\": \"https://example.com/product_bg_removed.png\",
 
-    \    \"ResultTrimapVectorUrl\":
-    \"https://example.com/trimap-vector.json\",\r
+    \    \"ResultTrimapVectorUrl\": null,
 
-    \    \"ErrorCode\": null,\r
+    \    \"ErrorCode\": null,
 
-    \    \"ErrorMessage\": null\r
+    \    \"ErrorMessage\": null
 
-    \  }\r
+    \  }
 
-    }\r
+    }
 
-    ```\r
+    ```
 
-    \r
 
-    **Webhook Headers:**\r
+    **Webhook Headers:**
 
-    - `Content-Type: application/json`\r
+    - `Content-Type: application/json`
 
-    - `X-Signature`: ECDSA signature of the payload (Base64-encoded)\r
+    - `X-Signature`: ECDSA signature of the payload (Base64-encoded)
 
-    \r
 
-    **Webhook Signature Verification:**\r
+    **Webhook Signature Verification:**
 
     - Each webhook includes an `X-Signature` header containing an ECDSA
-    signature\r
+    signature
 
-    - The signature is generated using SHA256 hash of the JSON payload\r
+    - The signature is generated using SHA256 hash of the JSON payload
 
     - Retrieve the public key from the `/public-keys` endpoint to verify
-    authenticity\r
+    authenticity
 
-    - Algorithm: ECDSA with P-256 curve, Base64-encoded signature\r
+    - Algorithm: ECDSA with P-256 curve, Base64-encoded signature
 
-    - This ensures webhooks are genuine and haven't been tampered.\r
+    - This ensures webhooks are genuine and haven't been tampered.
 
-    \r
 
-    **Example Signature Verification (Python):**\r
+    **Example Signature Verification (Python):**
 
-    ```python\r
+    ```python
 
-    import base64\r
+    import base64
 
-    import json\r
+    import json
 
-    from cryptography.hazmat.primitives import hashes, serialization\r
+    from cryptography.hazmat.primitives import hashes, serialization
 
-    from cryptography.hazmat.primitives.asymmetric import ec\r
+    from cryptography.hazmat.primitives.asymmetric import ec
 
-    \r
 
-    # Get the public key from /public-keys endpoint\r
+    # Get the public key from /public-keys endpoint
 
-    public_key_b64 = \"<public_key_from_api>\"\r
+    public_key_b64 = \"<public_key_from_api>\"
 
-    public_key_bytes = base64.b64decode(public_key_b64)\r
+    public_key_bytes = base64.b64decode(public_key_b64)
 
-    public_key = serialization.load_der_public_key(public_key_bytes)\r
+    public_key = serialization.load_der_public_key(public_key_bytes)
 
-    \r
 
-    # Get signature from X-Signature header\r
+    # Get signature from X-Signature header
 
-    signature_b64 = request.headers.get('X-Signature')\r
+    signature_b64 = request.headers.get('X-Signature')
 
-    signature = base64.b64decode(signature_b64)\r
+    signature = base64.b64decode(signature_b64)
 
-    \r
 
-    # Get the webhook payload\r
+    # Get the webhook payload
 
-    payload = request.body  # Raw JSON string\r
+    payload = request.body  # Raw JSON string
 
-    \r
 
-    # Verify the signature\r
+    # Verify the signature
 
-    try:\r
+    try:
 
-    \    public_key.verify(\r
+    \    public_key.verify(
 
-    \        signature,\r
+    \        signature,
 
-    \        payload.encode('utf-8'),\r
+    \        payload.encode('utf-8'),
 
-    \        ec.ECDSA(hashes.SHA256())\r
+    \        ec.ECDSA(hashes.SHA256())
 
-    \    )\r
+    \    )
 
-    \    print(\"Webhook signature verified successfully\")\r
+    \    print(\"Webhook signature verified successfully\")
 
-    except Exception as e:\r
+    except Exception as e:
 
-    \    print(\"Webhook signature verification failed\")\r
+    \    print(\"Webhook signature verification failed\")
 
-    ```\r
+    ```
 
-    \r
 
-    **Webhook Retry Mechanism:**\r
+    **Webhook Retry Mechanism:**
 
     - If your callback endpoint is unreachable or returns an error, the webhook
-    will be retried automatically\r
+    will be retried automatically
 
     - Each retry time is calculated after the previous attempt fails, following
-    an exponential backoff strategy:\r
+    an exponential backoff strategy:
 
-    \  - Retry 1: 10 minutes after initial failure\r
+    \  - Retry 1: 10 minutes after initial failure
 
-    \  - Retry 2: 30 minutes after retry 1 fails\r
+    \  - Retry 2: 30 minutes after retry 1 fails
 
-    \  - Retry 3: 90 minutes after retry 2 fails\r
+    \  - Retry 3: 90 minutes after retry 2 fails
 
-    \  - Retry 4: 270 minutes after retry 3 fails\r
+    \  - Retry 4: 270 minutes after retry 3 fails
 
-    \  - Retry 5: 1040 minutes after retry 4 fails (24 hours after job
-    finished)\r
+    \  - Retry 5: 1040 minutes after retry 4 fails (24 hours after job finished)
 
     - After 5 failed attempts, the webhook will be marked as expired and no
-    further retries will be attempted\r
+    further retries will be attempted
 
-    - Ensure your webhook endpoint returns a 2xx status code to confirm
-    receipt\r
+    - Ensure your webhook endpoint returns a 2xx status code to confirm receipt
 
-    \r
 
-    **Job Status Endpoint:**\r
+    **Job Status Endpoint:**
 
-    \r
 
     For asynchronous jobs, you can check the current status and retrieve results
-    using the job status endpoint:\r
+    using the job status endpoint:
 
-    \r
 
-    ```\r
+    ```
 
-    GET /v1/images/jobs/{jobId}/status\r
+    GET /v1/images/jobs/{jobId}/status
 
-    Authorization: Bearer <your_access_token>\r
+    Authorization: Bearer <your_access_token>
 
-    ```\r
+    ```
 
-    \r
 
-    **Response Structure:**\r
+    **Response Structure:**
 
-    ```json\r
+    ```json
 
-    {{\r
+    {
 
-    \  \"job_type\": \"RemoveBackground\",\r
+    \  \"job_type\": \"RemoveBackground\",
 
-    \  \"status\": {{\r
+    \  \"status\": {
 
-    \    \"status_code\": 200,\r
+    \    \"status_code\": 4,
 
-    \    \"status_name\": \"Completed\"\r
+    \    \"status_name\": \"Completed\"
 
-    \  }},\r
+    \  },
 
-    \  \"result\": {{\r
+    \  \"result\": {
 
-    \    \"result_image_url\": \"https://example.com/result-image.png\",\r
+    \    \"result_image_url\": \"https://example.com/product_bg_removed.png\",
 
-    \    \"result_trimap_vector_url\": null\r
+    \    \"result_trimap_vector_url\": null
 
-    \  }}\r
+    \  }
 
-    }}\r
+    }
 
-    ```\r
+    ```
 
-    \r
 
-    **Common Status Codes:**\r
+    **Common Status Codes:**
 
-    - `100` - Processing: Job is currently being processed\r
+    - `3` - Processing: Job is currently being processed
 
-    - `200` - Completed: Job completed successfully, result is available\r
+    - `4` - Completed: Job completed successfully, result is available
 
-    - `500` - Failed: Job processing failed\r
+    - `6` - Failed: Job processing failed
 
-    \r
 
-    **When to Use:**\r
+    **When to Use:**
 
     - Poll this endpoint to track job progress if you prefer not to rely solely
-    on webhooks\r
+    on webhooks
 
-    - Retrieve results if the webhook delivery failed\r
+    - Retrieve results if the webhook delivery failed
 
-    - Check job status before the webhook is received\r
+    - Check job status before the webhook is received
 
-    - Free to use (no tokens consumed)\r
+    - Free to use (no tokens consumed)
 
-    \r
 
-    ## Scalability\r
+    ## Scalability
 
     The infrastructure supports workloads ranging from single requests to tens
     of thousands of images. Rate limiting and job management are in place to
-    ensure consistent performance, even under heavy load.\r
+    ensure consistent performance, even under heavy load.
 
-    \r
 
-    ## Pricing\r
+    ## Pricing
 
     A token-based system provides transparent and predictable usage. Each method
-    specifies its cost in tokens.\r
+    specifies its cost in tokens.
 
-    \r
 
-    # Getting Started\r
+    # Getting Started
 
-    \r
 
     To begin using the API, you'll need the credentials and tokens. These are
     provided as part of your account setup, and once you have them you can
-    authenticate and start making requests.\r
+    authenticate and start making requests.
 
-    \r
 
-    ## Synchronous Mode (Immediate Results)\r
+    ## Synchronous Mode (Immediate Results)
 
     1.  **Authenticate:** Use your credentials to request an access token with
-    OAuth 2.0. This token is required to authorize your API calls.\r
+    OAuth 2.0. This token is required to authorize your API calls.
 
     2.  **Send an image:** Provide a public URL for the image or upload securely
-    using a presigned link. Supported formats are JPG, JPEG, PNG, and WEBP.\r
+    using a presigned link. Supported formats are JPG, JPEG, PNG, and WEBP.
 
     3.  **Call a method:** Choose an operation such as Remove Background, Create
     Mask, Create Trimap, Model Crop, or Color Matching, and submit your request
-    without a `callback_url`.\r
+    without a `callback_url`.
 
     4.  **Receive results:** The processed image URL is returned immediately in
-    the response (HTTP 200).\r
+    the response (HTTP 200).
 
-    \r
 
-    ## Asynchronous Mode (Non-blocking Processing)\r
+    ## Asynchronous Mode (Non-blocking Processing)
 
     1.  **Authenticate:** Use your credentials to request an access token with
-    OAuth 2.0.\r
+    OAuth 2.0.
 
     2.  **Send an image:** Provide a public URL for the image or upload securely
-    using a presigned link.\r
+    using a presigned link.
 
     3.  **Call a method:** Add the header `Respond-Mode: async` to enable async
     mode. Optionally include a `callback_url` parameter if you want webhook
-    notifications.\r
+    notifications.
 
     4.  **Receive job ID:** You'll immediately receive a `job_id` in the
-    response (HTTP 201).\r
+    response (HTTP 201) along with a `Retry-After` header indicating when to
+    check status.
 
-    5.  **Track progress:** Use the `GET /v1/images/jobs/{jobId}/status`
-    endpoint to check job status and retrieve results.\r
+    5.  **Track progress:** Wait for the time specified in the `Retry-After`
+    header (typically 30 seconds), then use the `GET
+    /v1/images/jobs/{jobId}/status` endpoint to check job status and retrieve
+    results.
 
     6.  **Setup webhook endpoint (optional):** If you provided a `callback_url`,
-    ensure your endpoint is ready to receive POST requests.\r
+    ensure your endpoint is ready to receive POST requests.
 
     7.  **Verify webhook (optional):** If using webhooks, verify the
-    `X-Signature` header using the public key from `/public-keys`.\r
+    `X-Signature` header using the public key from `/public-keys`.
 
     8.  **Process results:** Extract the result image URL from the webhook
-    payload's `ResultData` object or from the status endpoint.\r
+    payload's `ResultData` object or from the status endpoint.
 
-    \r
 
     \            "
   contact:
@@ -689,72 +688,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/JobCreationData"
         "400":
-          description: BadRequestError
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    description: HTTP status code
-                    format: int32
-                    example: 400
-                  title:
-                    type: string
-                    description: >-
-                      Error code indicating the type of issue encountered.
-
-
-                      Possible error codes:
-
-                      - `default_error`: An error occurred while processing your
-                      request. Please try again later.
-
-                      - `unknown_error`: Unknown error has occurred in our
-                      processing. The issue has been logged and will be looked
-                      at.
-
-                      - `unknown_backend_issue`: Unknown backend issue.
-
-                      - `invalid_file_url`: Invalid File URL format.
-
-                      - `presigned_file_move_failed`: Failed to move presigned
-                      file to workspace.
-
-                      - `file_type_not_supported`: File type not supported.
-
-                      - `download_failed`: Failed to download the file from
-                      provided URL.
-
-                      - `insufficient_balance`: Insufficient balance
-
-                      - `service_not_found`: No matching service found
-
-                      - `balance_not_found`: Balance not found for client
-
-                      - `no_token_consumption`: No token consumption found
-
-                      - `transaction_already_reverted`: Transaction already
-                      reverted
-
-                      - `invalid_file_name`: File name must include a valid
-                      extension
-
-                      - `presigned_url_creation_failed`: Can't create presigned
-                      url
-
-                      - `invalid_request`: Invalid request parameters
-                    example: BadRequestError
-                  detail:
-                    type: string
-                    description: Detailed error message
-                    example: Bad Request
-                description: Bad Request
-                example:
-                  status: 400
-                  title: BadRequestError
-                  detail: Bad Request
+          description: Bad Request
         "401":
           description: UnauthorizedError
           headers:
@@ -829,7 +763,7 @@ paths:
                   softer edges.
                 value:
                   image_url: https://example.com/product-image.jpg
-                  feather_width: 3
+                  feather_width: 2
               WithCustomTrimap:
                 summary: Mask with custom trimap
                 description: Use this example when you have a custom trimap to control which
@@ -837,7 +771,7 @@ paths:
                 value:
                   image_url: https://example.com/product-image.jpg
                   trimap_url: https://example.com/custom-trimap.png
-                  feather_width: 3
+                  feather_width: 1.5
               WithAsyncCallback:
                 summary: Asynchronous processing with webhook callback
                 description: Use this example to process the image asynchronously. Set the
@@ -848,7 +782,7 @@ paths:
                   (HTTP 201).
                 value:
                   image_url: https://example.com/product-image.jpg
-                  feather_width: 3
+                  feather_width: 1.5
                   callback_url: https://your-domain.com/webhook/create-mask
       responses:
         "200":
@@ -864,72 +798,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/JobCreationData"
         "400":
-          description: BadRequestError
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    description: HTTP status code
-                    format: int32
-                    example: 400
-                  title:
-                    type: string
-                    description: >-
-                      Error code indicating the type of issue encountered.
-
-
-                      Possible error codes:
-
-                      - `default_error`: An error occurred while processing your
-                      request. Please try again later.
-
-                      - `unknown_error`: Unknown error has occurred in our
-                      processing. The issue has been logged and will be looked
-                      at.
-
-                      - `unknown_backend_issue`: Unknown backend issue.
-
-                      - `invalid_file_url`: Invalid File URL format.
-
-                      - `presigned_file_move_failed`: Failed to move presigned
-                      file to workspace.
-
-                      - `file_type_not_supported`: File type not supported.
-
-                      - `download_failed`: Failed to download the file from
-                      provided URL.
-
-                      - `insufficient_balance`: Insufficient balance
-
-                      - `service_not_found`: No matching service found
-
-                      - `balance_not_found`: Balance not found for client
-
-                      - `no_token_consumption`: No token consumption found
-
-                      - `transaction_already_reverted`: Transaction already
-                      reverted
-
-                      - `invalid_file_name`: File name must include a valid
-                      extension
-
-                      - `presigned_url_creation_failed`: Can't create presigned
-                      url
-
-                      - `invalid_request`: Invalid request parameters
-                    example: BadRequestError
-                  detail:
-                    type: string
-                    description: Detailed error message
-                    example: Bad Request
-                description: Bad Request
-                example:
-                  status: 400
-                  title: BadRequestError
-                  detail: Bad Request
+          description: Bad Request
         "401":
           description: UnauthorizedError
           headers:
@@ -1027,72 +896,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/JobCreationData"
         "400":
-          description: BadRequestError
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    description: HTTP status code
-                    format: int32
-                    example: 400
-                  title:
-                    type: string
-                    description: >-
-                      Error code indicating the type of issue encountered.
-
-
-                      Possible error codes:
-
-                      - `default_error`: An error occurred while processing your
-                      request. Please try again later.
-
-                      - `unknown_error`: Unknown error has occurred in our
-                      processing. The issue has been logged and will be looked
-                      at.
-
-                      - `unknown_backend_issue`: Unknown backend issue.
-
-                      - `invalid_file_url`: Invalid File URL format.
-
-                      - `presigned_file_move_failed`: Failed to move presigned
-                      file to workspace.
-
-                      - `file_type_not_supported`: File type not supported.
-
-                      - `download_failed`: Failed to download the file from
-                      provided URL.
-
-                      - `insufficient_balance`: Insufficient balance
-
-                      - `service_not_found`: No matching service found
-
-                      - `balance_not_found`: Balance not found for client
-
-                      - `no_token_consumption`: No token consumption found
-
-                      - `transaction_already_reverted`: Transaction already
-                      reverted
-
-                      - `invalid_file_name`: File name must include a valid
-                      extension
-
-                      - `presigned_url_creation_failed`: Can't create presigned
-                      url
-
-                      - `invalid_request`: Invalid request parameters
-                    example: BadRequestError
-                  detail:
-                    type: string
-                    description: Detailed error message
-                    example: Bad Request
-                description: Bad Request
-                example:
-                  status: 400
-                  title: BadRequestError
-                  detail: Bad Request
+          description: Bad Request
         "401":
           description: UnauthorizedError
           headers:
@@ -1300,7 +1104,7 @@ paths:
                   value:
                     job_type: RemoveBackground
                     status:
-                      status_code: 200
+                      status_code: 4
                       status_name: Completed
                     result:
                       result_image_url: https://example.com/result/image-background-removed.png
@@ -1312,7 +1116,7 @@ paths:
                   value:
                     job_type: ModelCrop
                     status:
-                      status_code: 100
+                      status_code: 3
                       status_name: Processing
                     result: null
                 FailedJob:
@@ -1322,7 +1126,7 @@ paths:
                   value:
                     job_type: CreateTrimap
                     status:
-                      status_code: 500
+                      status_code: 6
                       status_name: Failed
                     result: null
                 CompletedTrimapJob:
@@ -1332,7 +1136,7 @@ paths:
                   value:
                     job_type: CreateTrimap
                     status:
-                      status_code: 200
+                      status_code: 4
                       status_name: Completed
                     result:
                       result_image_url: https://example.com/result/trimap-image.png
@@ -1446,72 +1250,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/JobCreationData"
         "400":
-          description: BadRequestError
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    description: HTTP status code
-                    format: int32
-                    example: 400
-                  title:
-                    type: string
-                    description: >-
-                      Error code indicating the type of issue encountered.
-
-
-                      Possible error codes:
-
-                      - `default_error`: An error occurred while processing your
-                      request. Please try again later.
-
-                      - `unknown_error`: Unknown error has occurred in our
-                      processing. The issue has been logged and will be looked
-                      at.
-
-                      - `unknown_backend_issue`: Unknown backend issue.
-
-                      - `invalid_file_url`: Invalid File URL format.
-
-                      - `presigned_file_move_failed`: Failed to move presigned
-                      file to workspace.
-
-                      - `file_type_not_supported`: File type not supported.
-
-                      - `download_failed`: Failed to download the file from
-                      provided URL.
-
-                      - `insufficient_balance`: Insufficient balance
-
-                      - `service_not_found`: No matching service found
-
-                      - `balance_not_found`: Balance not found for client
-
-                      - `no_token_consumption`: No token consumption found
-
-                      - `transaction_already_reverted`: Transaction already
-                      reverted
-
-                      - `invalid_file_name`: File name must include a valid
-                      extension
-
-                      - `presigned_url_creation_failed`: Can't create presigned
-                      url
-
-                      - `invalid_request`: Invalid request parameters
-                    example: BadRequestError
-                  detail:
-                    type: string
-                    description: Detailed error message
-                    example: Bad Request
-                description: Bad Request
-                example:
-                  status: 400
-                  title: BadRequestError
-                  detail: Bad Request
+          description: Bad Request
         "401":
           description: UnauthorizedError
           headers:
@@ -1582,7 +1321,7 @@ paths:
                   image_url: https://example.com/product-image.jpg
                   transparent_background: true
                   background_color: null
-                  feather_width: 3
+                  feather_width: 1.5
               WithBackgroundColor:
                 summary: Remove background with solid color
                 description: Use this example to remove the background and replace it with a
@@ -1592,7 +1331,7 @@ paths:
                   image_url: https://example.com/product-image.jpg
                   background_color: "#FFFFFF"
                   transparent_background: false
-                  feather_width: 5
+                  feather_width: 2
               WithCustomTrimap:
                 summary: Remove background with custom trimap
                 description: Use this example when you have a custom trimap image to control
@@ -1603,7 +1342,7 @@ paths:
                   trimap_url: https://example.com/custom-trimap.png
                   transparent_background: true
                   background_color: null
-                  feather_width: 3
+                  feather_width: 1.5
               WithAsyncCallback:
                 summary: Asynchronous processing with webhook callback
                 description: Use this example to process the image asynchronously. Set the
@@ -1616,7 +1355,7 @@ paths:
                   image_url: https://example.com/product-image.jpg
                   transparent_background: true
                   background_color: null
-                  feather_width: 3
+                  feather_width: 1.5
                   callback_url: https://your-domain.com/webhook/remove-background
       responses:
         "200":
@@ -1632,72 +1371,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/JobCreationData"
         "400":
-          description: BadRequestError
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: integer
-                    description: HTTP status code
-                    format: int32
-                    example: 400
-                  title:
-                    type: string
-                    description: >-
-                      Error code indicating the type of issue encountered.
-
-
-                      Possible error codes:
-
-                      - `default_error`: An error occurred while processing your
-                      request. Please try again later.
-
-                      - `unknown_error`: Unknown error has occurred in our
-                      processing. The issue has been logged and will be looked
-                      at.
-
-                      - `unknown_backend_issue`: Unknown backend issue.
-
-                      - `invalid_file_url`: Invalid File URL format.
-
-                      - `presigned_file_move_failed`: Failed to move presigned
-                      file to workspace.
-
-                      - `file_type_not_supported`: File type not supported.
-
-                      - `download_failed`: Failed to download the file from
-                      provided URL.
-
-                      - `insufficient_balance`: Insufficient balance
-
-                      - `service_not_found`: No matching service found
-
-                      - `balance_not_found`: Balance not found for client
-
-                      - `no_token_consumption`: No token consumption found
-
-                      - `transaction_already_reverted`: Transaction already
-                      reverted
-
-                      - `invalid_file_name`: File name must include a valid
-                      extension
-
-                      - `presigned_url_creation_failed`: Can't create presigned
-                      url
-
-                      - `invalid_request`: Invalid request parameters
-                    example: BadRequestError
-                  detail:
-                    type: string
-                    description: Detailed error message
-                    example: Bad Request
-                description: Bad Request
-                example:
-                  status: 400
-                  title: BadRequestError
-                  detail: Bad Request
+          description: Bad Request
         "401":
           description: UnauthorizedError
           headers:
@@ -1774,7 +1448,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SecurityKey"
+                $ref: "#/components/schemas/PublicKeyData"
         "401":
           description: UnauthorizedError
           headers:
@@ -1885,7 +1559,7 @@ components:
           description: When running in sync mode, a URL for the JPG or PNG image is
             returned. This URL is temporary and will expire after a certain
             period.
-          example: https://example.com/color-matched-image.jpg
+          example: https://example.com/image_color_matched.jpg
       description: Synchronous mode result.
     CreateMaskCommand:
       required:
@@ -1894,12 +1568,14 @@ components:
       properties:
         feather_width:
           type: number
-          description: "This is an optional setting. If omitted, the feather width 
-            will be automatically determined by the AI. If set to 0, no feathering 
-            will be applied, resulting in very sharp edges. Other values specify 
-            the number of pixels that the mask will take to transition from fully 
-            opaque (255, white) to fully transparent (0, black). Higher values 
-            provide softer edges."
+          description: This is an optional setting which you should only use if the
+            default feather width, determined by the AI, does not suit your
+            needs. This value is the number of pixels that the mask will take to
+            transition from fully opaque (255, white) to fully transparent (0,
+            black). A value of 0 or 1 will give you very sharp edges while
+            larger values will provide softer edges. It is recommended to use
+            this only in cases where the focus is uniform on the object. Avoid
+            using this in cases like depth of field effects.
           format: double
           nullable: true
           example: 1.5
@@ -1933,7 +1609,7 @@ components:
           type: string
           description: When running in sync mode, a URL for the PNG image is returned.
             This URL is temporary and will expire after a certain period.
-          example: https://example.com/trimap-image.png
+          example: https://example.com/image_masked.png
       description: Synchronous mode result.
     CreateTrimapCommand:
       required:
@@ -1964,11 +1640,11 @@ components:
           description: When running in sync mode, a URL for the PNG trimap image is
             returned. This URL is temporary and will expire after a certain
             period.
-          example: https://example.com/trimap-image.png
+          example: https://example.com/image_trimaprgb.png
         result_trimap_vector_url:
           type: string
           description: A JSON representation of the trimap in vector format.
-          example: https://example.com/trimap-vector.json
+          example: https://example.com/image_trimap.json
       description: Synchronous mode result.
     JobCreationData:
       type: object
@@ -1990,13 +1666,13 @@ components:
           description: URL to the processed result image. This URL is temporary and will
             expire after a certain period. Available for all job types.
           nullable: true
-          example: https://example.com/result/image.png
+          example: https://example.com/image_bg_removed.png
         result_trimap_vector_url:
           type: string
           description: URL to the trimap vector file (JSON format). Only available for
             CreateTrimap jobs. This field will be null for other job types.
           nullable: true
-          example: https://example.com/result/trimap-vector.json
+          example: https://example.com/image_trimap.json
       description: Contains URLs to the processing results. Available only when the
         job status is Completed.
       nullable: true
@@ -2005,14 +1681,28 @@ components:
       properties:
         status_code:
           type: integer
-          description: "Numeric status code. Common values: 100 (Processing), 200
-            (Completed), 500 (Failed)."
+          description: >-
+            Numeric status code indicating the current state of the job.
+            Possible values:
+
+            - 1: Created - Job has been created but not yet ready for processing
+
+            - 2: ReadyForProcess - Job is ready to be processed
+
+            - 3: Processing - Job is currently being processed
+
+            - 4: Completed - Job has completed successfully
+
+            - 5: Delivered - Job results have been delivered
+
+            - 6: Failed - Job has failed during processing
           format: int32
-          example: 200
+          example: 4
         status_name:
           type: string
-          description: Human-readable status name corresponding to the status code (e.g.,
-            Processing, Completed, Failed).
+          description: "Human-readable status name corresponding to the status code.
+            Possible values: Created, ReadyForProcess, Processing, Completed,
+            Delivered, Failed."
           example: Completed
       description: Status information for a job.
     JobStatusResponse:
@@ -2112,7 +1802,7 @@ components:
           description: When running in sync mode, a URL for the JPG or PNG image is
             returned. This URL is temporary and will expire after a certain
             period.
-          example: https://example.com/cropped_output.jpeg
+          example: https://example.com/image_cropped.jpg
       description: Synchronous mode result.
     PrepareUploadRequest:
       required:
@@ -2129,6 +1819,13 @@ components:
       description: Represents a request to prepare a file upload. You provide the
         file's name (including extension) to receive a secure, temporary URL for
         uploading your asset.
+    PublicKeyData:
+      type: object
+      properties:
+        key:
+          $ref: "#/components/schemas/SecurityKey"
+      description: The response containing the public key information for webhook
+        signature verification.
     RemoveBackgroundCommand:
       required:
         - image_url
@@ -2143,12 +1840,14 @@ components:
           example: https://example.com/image.jpg
         feather_width:
           type: number
-          description: "This is an optional setting. If omitted, the feather width 
-            will be automatically determined by the AI. If set to 0, no feathering 
-            will be applied, resulting in very sharp edges. Other values specify 
-            the number of pixels that the mask will take to transition from fully 
-            opaque (255, white) to fully transparent (0, black). Higher values 
-            provide softer edges."
+          description: This is an optional setting which you should only use if the
+            default feather width, determined by the AI, does not suit your
+            needs. This value is the number of pixels that the mask will take to
+            transition from fully opaque (255, white) to fully transparent (0,
+            black). A value of 0 or 1 will give you very sharp edges while
+            larger values will provide softer edges. It is recommended to use
+            this only in cases where the focus is uniform on the object. Avoid
+            using this in cases like depth of field effects.
           format: double
           nullable: true
           example: 1.5
@@ -2181,14 +1880,11 @@ components:
           format: uri
           nullable: true
           example: https://your-domain.com/webhook/background-removal
-      description: "Represents a command for users to request background removal from
-        an image, creating a new job in the automation system. Use this to
-        submit your image and required options for processing.\r
-
-        \                Note: You must choose only one of the following options
-        for the output background—either 'background_color' or
-        'transparent_background'. Do not set both, and do not leave both unset
-        (one must be provided)."
+      description: >-
+        Represents a command for users to request background removal from an
+        image, creating a new job in the automation system. Use this to submit
+        your image and required options for processing.
+                        Note: You must choose only one of the following options for the output background—either 'background_color' or 'transparent_background'. Do not set both, and do not leave both unset (one must be provided).
     RemoveBackgroundResult:
       type: object
       properties:
@@ -2197,7 +1893,7 @@ components:
           description: When running in sync mode, a URL for the input image with its
             background removed is returned. This URL is temporary and will
             expire after a certain period.
-          example: https://example.com/trimap-image.png
+          example: https://example.com/image_bg_removed.png
       description: Synchronous mode result.
     RequestFileUploadResult:
       required:
@@ -2232,17 +1928,18 @@ components:
         algorithm:
           type: string
           description: The cryptographic algorithm used to sign webhook payloads (e.g.,
-            'RS256'). Use this to verify the integrity of messages from Pixelz.
-          example: RS256
+            'ECDSA'). Use this to verify the integrity of messages from Pixelz.
+          example: ECDSA
         encoding:
           type: string
-          description: The encoding format of the public key
-          example: base64
+          description: The encoding format of the public key (e.g., 'Base64').
+          example: Base64
         public_key:
           type: string
-          description: The public key used for verifying webhook signatures
-          example: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQ...
-      description: Represents a base command for creating a job in the automation system.
+          description: The public key used for verifying webhook signatures.
+          example: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEV+sTTj97fDafy//ppwfOiF9n01wQH36ZCjKsitqoE2h7RZP6eTmzfKZ4CsGxU3z3Uj8ftD2NCZhKTzMC7zyM5Q==
+      description: Contains the cryptographic details for verifying webhook signatures
+        from Pixelz.
     SwatchImage:
       type: object
       properties:
@@ -2279,39 +1976,40 @@ components:
       bearerFormat: JWT
     OAuth2:
       type: oauth2
-      description: "OAuth 2.0 authentication using the Client Credentials Grant
-        flow.\r
+      description: >-
+        OAuth 2.0 authentication using the Client Credentials Grant flow.
 
-        \r
 
-        To authenticate:\r
+        To authenticate:
 
         1. Obtain your client_id and client_secret from your Pixelz account
-        dashboard\r
+        dashboard
 
         2. Request an access token from the token endpoint with
-        grant_type=client_credentials\r
+        grant_type=client_credentials
 
         3. Use the returned access token in the Authorization header: 'Bearer
-        {access_token}'\r
+        {access_token}'
 
         4. Access tokens expire after 1 hour (3600 seconds) - request a new
-        token when needed\r
+        token when needed
 
-        \r
 
-        Available scopes:\r
+        Available scopes:
 
-        - automation.api: Access to image processing endpoints\r
+        - automation.api: Access to image processing endpoints
 
         - file.api: Access to file upload functionality (requires account
-        enablement)"
+        enablement)
       flows:
         clientCredentials:
-          tokenUrl: https://id.pixelz.com/realms/pixelz-automations/protocol/openid-connect/
+          tokenUrl: https://id.pixelz.com/realms/pixelz-automations/protocol/openid-connect/token
           scopes:
-            automation-api.all: AutomationApi
+            automation-api.images.all: AutomationApi
             automation-api.files.upload: FileApi
+security:
+  - OAuth2:
+      - automation-api.images.all
 tags:
   - name: Image processing
   - name: File
